@@ -23,12 +23,22 @@ class Profile:
         telename = update.effective_chat.username
 
         if self.service.is_user_existing(telename):
-            message = "you are an existing user excellent, here is your info"
+            data = self.service.show_profile(telename)
+            print(data["age"])
+
+            message = bot_text.profile.format(telename,
+                                              data["age"],
+                                              data["gender"],
+                                              data["age pref"],
+                                              data["gender pref"],
+                                              data["cuisine pref"],
+                                              data["diet pref"]
+                                              )
         else:
             message = "you don't exist in our system yet pls go fill it up"
         
         # retrieve the users info and let them know what is filled up and what is missing
-
+        
         markup = InlineKeyboardMarkup(inline_keyboard)
         await context.bot.send_message(chat_id=update.effective_chat.id, 
                                     text=message, 

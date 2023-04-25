@@ -24,3 +24,19 @@ choose_diet_text = "Enter any dietary restrictions you may have"
 choose_buddy_age = "Pick the age ranges you would like your Eatsee buddy to fall into!"
 
 choose_buddy_gender = "Pick the genders you would like your Eatsee buddy to fall into!"
+
+
+profile = """Welcome back {}! Here is your profile information!
+
+Personal Info:
+Age-Range: {}
+Gender: {}
+
+Prefered Matchee Profile:
+Age-Range: {}
+Gender: {}
+
+Food and Diet Preferences:
+Cuisine Preferences: {}
+Dietary Restrictions: {}
+"""

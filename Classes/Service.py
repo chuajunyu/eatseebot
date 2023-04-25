@@ -3,7 +3,11 @@ from .APIClient import APIClient
 
 class Service:
     """
-    Provides Services to the telegram bot
+    Provides Services to the telegram bot by calling on the APIClient
+    to make the appropriate API requests, and handling any additional
+    logic.
+
+    Handles any errors or bad response codes returned by the API.
     """
     def __init__(self):
         self.api_client = APIClient()
@@ -17,8 +21,15 @@ class Service:
         
     def create_user(self, telename, age, gender):
         response = self.api_client.create_user(True, telename, age, gender)
-        print(response)
         if response["code"] == 200:
             return True
+        else:
+            return False
+        
+    def show_profile(self, telename):
+        response = self.api_client.show_profile(telename)
+        if response["code"] == 200:
+            data = response["data"]
+            return data
         else:
             return False

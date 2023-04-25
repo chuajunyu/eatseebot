@@ -11,6 +11,12 @@ class Singleton(type):
 
 
 class APIClient(metaclass = Singleton):
+    """
+    Handles all API requests that are made to the EatSee Database API
+
+    Will Handle basic errors such as API is down etc, else, will return
+    the raw response.
+    """
     def __init__(self):
         self.api_ip = ConfigManager().get('API_ip')
 

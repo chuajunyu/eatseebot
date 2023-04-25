@@ -1,10 +1,10 @@
 import logging
-from telegram.ext import *
-from telegram import *
 
-import bot_text
 from Classes import *
 from Components import *
+
+from telegram.ext import *
+from telegram import *
 
 
 config = ConfigManager("dev.config")
@@ -67,13 +67,13 @@ def main() -> None:
             ]
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
-        name="my_conversation",
+        name="profile_conversation",
         persistent=False,
     )
 
 
     # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
-    conv_handler = ConversationHandler(
+    home_handler = ConversationHandler(
         entry_points=[CommandHandler("start", home.start)],
         states={
             "HOME_START": [
@@ -84,11 +84,11 @@ def main() -> None:
             ],
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
-        name="my_conversation",
+        name="home_conversation",
         persistent=False,
     )
 
-    application.add_handler(conv_handler)
+    application.add_handler(home_handler)
     application.add_handler(profile_handler)
 
     # Run the bot until the user presses Ctrl-C
