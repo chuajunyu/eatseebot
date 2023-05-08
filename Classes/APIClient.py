@@ -24,11 +24,13 @@ class APIClient(metaclass = Singleton):
         url = self.api_ip + endpoint
         response = requests.get(url, json=data)
         # Include error handling here
+        
         return response
 
     def api_post(self, endpoint, data={}):
         url = self.api_ip + endpoint
         response = requests.post(url, json=data)
+        
         # Include error handling here
         return response
 
@@ -76,5 +78,27 @@ class APIClient(metaclass = Singleton):
         response = self.api_post("/show_diet_choices")
         return response.json()
     
+    def queue(self, telename:str):
+        data = {
+            "telename": telename
+        }
+        response = self.api_post("/queue/", data=data)
+        
+        
+        return response.json()
+    
+    def dequeue(self, telename:str):
+        data = {
+            "telename": telename
+        }
+        response = self.api_post("/dequeue/", data=data)
+        return response.json()
+
+    def match(self, telename:str):
+        data = {
+            "telename": telename
+        }
+        response = self.api_post("/match/", data=data)
+        return response.json()
 
     
