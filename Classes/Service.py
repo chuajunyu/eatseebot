@@ -1,4 +1,5 @@
 from .APIClient import APIClient
+from .KeyboardGenerator import KeyboardGenerator
 
 
 class Service:
@@ -11,6 +12,8 @@ class Service:
     """
     def __init__(self):
         self.api_client = APIClient()
+        self.keyboard_generator = KeyboardGenerator()
+        self.cache = dict()
 
     def is_user_existing(self, telename):
         response = self.api_client.get_user_id(telename)
@@ -31,5 +34,53 @@ class Service:
         if response["code"] == 200:
             data = response["data"]
             return data
+        else:
+            return False
+        
+    def get_age_choices(self):
+        if "get_age_choices" in self.cache:
+            return self.cache["get_age_choices"]
+        else:
+            response = self.api_client.show_age_choices()
+            if response["code"] == 200:
+                return response["data"]["age"]
+            
+    def get_gender_choices(self):
+        if "get_gender_choices" in self.cache:
+            return self.cache["get_gender_choices"]
+        else:
+            response = self.api_client.show_gender_choices()
+            if response["code"] == 200:
+                return response["data"]["gender"]
+            
+    def get_cuisine_choices(self):
+        if "get_cuisine_choices" in self.cache:
+            return self.cache["get_cuisine_choices"]
+        else:
+            response = self.api_client.show_cuisine_choices()
+            if response["code"] == 200:
+                return response["data"]["cuisine"]
+            
+    def get_diet_choices(self):
+        if "get_diet_choices" in self.cache:
+            return self.cache["get_diet_choices"]
+        else:
+            response = self.api_client.show_diet_choices()
+            if response["code"] == 200:
+                return response["data"]["diet"]
+            
+    def change_age(self, telename, age):
+        response = self.api_client.change_age(telename, age)
+        print(response)
+        if response["code"] == 200:
+            return True
+        else:
+            return False
+        
+    def change_gender(self, telename, gender):
+        response = self.api_client.change_gender(telename, gender)
+        print(response)
+        if response["code"] == 200:
+            return True
         else:
             return False

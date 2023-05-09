@@ -25,7 +25,10 @@ def main() -> None:
 
     profile_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(callback=profile.profile_home,
-                                           pattern="profile")],
+                                           pattern="profile"),
+                      CallbackQueryHandler(callback=profile.new_user_age,
+                                           pattern="new_profile")                    
+                                           ],
         states={
             "PROFILE_HOME": [
                     CallbackQueryHandler(
@@ -41,16 +44,28 @@ def main() -> None:
                         pattern="buddy_pref"
                     )
             ],
+            "NEW_CHOOSING_AGE": [
+                CallbackQueryHandler(
+                    callback=profile.handle_new_user_age__new_user_gender,
+                    pattern="1|2|3|4|5|6"
+                )
+            ],
+            "NEW_CHOOSING_GENDER": [
+                CallbackQueryHandler(
+                    callback=profile.handle_new_user_gender__home,
+                    pattern="1|2|3"
+                )
+            ],
             "CHOOSING_AGE": [
                 CallbackQueryHandler(
                     callback=profile.handle_choosing_age__edit_gender,
-                    pattern="16-19|20-24|25-29"
+                    pattern="1|2|3|4|5|6"
                 )
             ],
             "CHOOSING_GENDER": [
                 CallbackQueryHandler(
                     callback=profile.handle_choosing_gender__home,
-                    pattern="Male|Female|Non Binary"
+                    pattern="1|2|3"
                 )
             ],
             "CHOOSING_CUISINE": [
@@ -64,9 +79,9 @@ def main() -> None:
                     callback=profile.edit_your_age,
                     pattern="yourinfo"
                 )
-            ]
+            ],
         },
-        fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
+        fallbacks=[CommandHandler("start", home.start)],
         name="profile_conversation",
         persistent=False,
     )

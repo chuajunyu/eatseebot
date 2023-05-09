@@ -12,6 +12,22 @@ Enter "/T&C" to view our Terms and Conditions.
 
 Have fun!"""
 
+home_existing_user = """Hey *{}*, welcome back to *@eatseebot*! Here is your profile information!
+
+*Personal Info*
+Age-Range: {}
+Gender: {}
+
+*Preferred Matchee Profile*:
+Age-Range: {}
+Gender: {}
+
+*Food and Diet Preferences*:
+Cuisine Preferences: {}
+Dietary Restrictions: {}
+
+Find a match to eat a meal with now!
+"""
 
 choose_age_text = "Enter your age range!"
 
@@ -26,17 +42,12 @@ choose_buddy_age = "Pick the age ranges you would like your Eatsee buddy to fall
 choose_buddy_gender = "Pick the genders you would like your Eatsee buddy to fall into!"
 
 
-profile = """Welcome back {}! Here is your profile information!
+profile = """What would you like to edit?
 
-Personal Info:
-Age-Range: {}
-Gender: {}
-
-Prefered Matchee Profile:
-Age-Range: {}
-Gender: {}
-
-Food and Diet Preferences:
-Cuisine Preferences: {}
-Dietary Restrictions: {}
+*Personal Info* -- Your Age and Gender
+*Food Preference* -- Cuisine and Diet Restrictions
+*Buddy Preference* -- Your Matchee's Age and Gender
 """
+
+
+

@@ -59,7 +59,6 @@ class APIClient(metaclass = Singleton):
         response = self.api_post("/get_user_id/", data=data)
         return response.json()
 
-
     def show_age_choices(self):
         response = self.api_post("/show_age_choices")
         return response.json()
@@ -74,6 +73,23 @@ class APIClient(metaclass = Singleton):
     
     def show_diet_choices(self):
         response = self.api_post("/show_diet_choices")
+        return response.json()
+    
+    def change_age(self, telename, age):
+        data = {
+            "telename": telename,
+            "characteristic": age
+        }
+        response = self.api_post("/change_age", data=data)
+        print(response)
+        return response.json()
+
+    def change_gender(self, telename, gender):
+        data = {
+            "telename": telename,
+            "characteristic": gender
+        }
+        response = self.api_post("/change_gender", data=data)
         return response.json()
     
 
