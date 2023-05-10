@@ -36,6 +36,34 @@ class Service:
             return data
         else:
             return False
+           
+    def select_user_age_pref(self, telename):
+        response = self.api_client.select_age_preference(telename)
+        if response["code"] == 200:
+            return response["data"]
+        else:
+            return False
+        
+    def select_user_gender_pref(self, telename):
+        response = self.api_client.select_gender_preference(telename)
+        if response["code"] == 200:
+            return response["data"]
+        else:
+            return False
+    
+    def select_user_cuisine_pref(self, telename):
+        response = self.api_client.select_cuisine_preference(telename)
+        if response["code"] == 200:
+            return response["data"]
+        else:
+            return False
+        
+    def select_user_diet_pref(self, telename):
+        response = self.api_client.select_diet_preference(telename)
+        if response["code"] == 200:
+            return response["data"]
+        else:
+            return False
         
     def get_age_choices(self):
         if "get_age_choices" in self.cache:
@@ -71,7 +99,6 @@ class Service:
             
     def change_age(self, telename, age):
         response = self.api_client.change_age(telename, age)
-        print(response)
         if response["code"] == 200:
             return True
         else:
@@ -79,8 +106,36 @@ class Service:
         
     def change_gender(self, telename, gender):
         response = self.api_client.change_gender(telename, gender)
-        print(response)
         if response["code"] == 200:
             return True
         else:
             return False
+        
+    def change_age_preferences(self, telename, preferences):
+        response = self.api_client.change_age_preferences(telename, preferences)
+        if response["code"] == 200:
+            return True
+        else:
+            return False
+    
+    def change_gender_preferences(self, telename, preferences):
+        response = self.api_client.change_gender_preferences(telename, preferences)
+        if response["code"] == 200:
+            return True
+        else:
+            return False
+    
+    def change_cuisine_preferences(self, telename, preferences):
+        response = self.api_client.change_cuisine_preferences(telename, preferences)
+        if response["code"] == 200:
+            return True
+        else:
+            return False
+    
+    def change_diet_preferences(self, telename, preferences):
+        response = self.api_client.change_diet_preferences(telename, preferences)
+        if response["code"] == 200:
+            return True
+        else:
+            return False
+    

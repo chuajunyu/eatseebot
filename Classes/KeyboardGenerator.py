@@ -14,7 +14,7 @@ class KeyboardGenerator:
             callback_data, option = choice
 
             # If option is selected, add a tick beside it
-            if option in selected:
+            if callback_data in selected:
                 option_text = option + " " + selected_icon
             else:
                 option_text = option

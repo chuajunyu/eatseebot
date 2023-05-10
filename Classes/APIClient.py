@@ -22,14 +22,18 @@ class APIClient(metaclass = Singleton):
 
     def api_get(self, endpoint, data={}):
         url = self.api_ip + endpoint
-        response = requests.get(url, json=data)
-        # Include error handling here
+        try:
+            response = requests.get(url, json=data)
+        except BaseException as e:
+            raise e
         return response
 
     def api_post(self, endpoint, data={}):
         url = self.api_ip + endpoint
-        response = requests.post(url, json=data)
-        # Include error handling here
+        try:
+            response = requests.post(url, json=data)
+        except BaseException as e:
+            raise e
         return response
 
     def check_server_status(self):
@@ -45,42 +49,37 @@ class APIClient(metaclass = Singleton):
         response = self.api_post("/create_user/", data=data)
         return response.json()
     
-    def show_profile(self, telename:str):
+    def __get_user_info(self, telename, url):
         data = {
             "telename": telename
         }
-        response = self.api_post("/show_profile/", data=data)
+        response = self.api_post(url, data=data)
         return response.json()
+
+    def show_profile(self, telename:str):
+        return self.__get_user_info(telename, "/show_profile/")
     
     def get_user_id(self, telename:str):
-        data = {
-            "telename": telename
-        }
-        response = self.api_post("/get_user_id/", data=data)
-        return response.json()
+        return self.__get_user_info(telename, "/get_user_id/")
+    
+    def select_age_preference(self, telename):
+        return self.__get_user_info(telename, "/select_age_preferences/")
+    
+    def select_gender_preference(self, telename):
+        return self.__get_user_info(telename, "/select_gender_preferences/")
+    
+    def select_cuisine_preference(self, telename):
+        return self.__get_user_info(telename, "/select_cuisine_preferences/")
+    
+    def select_diet_preference(self, telename):
+        return self.__get_user_info(telename, "/select_diet_preferences/")
 
-    def show_age_choices(self):
-        response = self.api_post("/show_age_choices")
-        return response.json()
-
-    def show_gender_choices(self):
-        response = self.api_post("/show_gender_choices")
-        return response.json()
-    
-    def show_cuisine_choices(self):
-        response = self.api_post("/show_cuisine_choices")
-        return response.json()
-    
-    def show_diet_choices(self):
-        response = self.api_post("/show_diet_choices")
-        return response.json()
-    
     def change_age(self, telename, age):
         data = {
             "telename": telename,
             "characteristic": age
         }
-        response = self.api_post("/change_age", data=data)
+        response = self.api_post("/change_age/", data=data)
         print(response)
         return response.json()
 
@@ -89,8 +88,46 @@ class APIClient(metaclass = Singleton):
             "telename": telename,
             "characteristic": gender
         }
-        response = self.api_post("/change_gender", data=data)
+        response = self.api_post("/change_gender/", data=data)
         return response.json()
+    
+    def __change_preferences(self, telename, preferences, url):
+        data = {
+            "telename": telename,
+            "preferences": preferences
+        }
+        response = self.api_post(url, data=data)
+        return response.json()
+
+    def change_age_preferences(self, telename, preferences):
+        return self.__change_preferences(telename, preferences, "/change_age_preferences/")
+        
+    def change_gender_preferences(self, telename, preferences):
+        return self.__change_preferences(telename, preferences, "/change_gender_preferences/")
+
+    def change_cuisine_preferences(self, telename, preferences):
+        return self.__change_preferences(telename, preferences, "/change_cuisine_preferences/")
+
+    def change_diet_preferences(self, telename, preferences):
+        return self.__change_preferences(telename, preferences, "/change_diet_preferences/")
+
+    def show_age_choices(self):
+        response = self.api_post("/show_age_choices/")
+        return response.json()
+
+    def show_gender_choices(self):
+        response = self.api_post("/show_gender_choices/")
+        return response.json()
+    
+    def show_cuisine_choices(self):
+        response = self.api_post("/show_cuisine_choices/")
+        return response.json()
+    
+    def show_diet_choices(self):
+        response = self.api_post("/show_diet_choices/")
+        return response.json()
+    
+    
     
 
     

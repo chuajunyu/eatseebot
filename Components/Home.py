@@ -20,11 +20,11 @@ class Home:
 
     def convert_to_text(self, selected, choice_dict):
         if type(selected) == int:
-            return choice_dict[str(selected)]
+            return f"_{choice_dict[str(selected)]}_"
         output = ""
         for i in selected:
-            output += dict[i] + ", "
-        output.strip(",")
+            output += f"_{choice_dict[str(i)]}_, "
+        output = output.strip(", ")
         return output
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -36,13 +36,13 @@ def main() -> None:
                         pattern="personal_info"
                     ),
                     CallbackQueryHandler(
-                        callback=home.not_implemented_yet,
+                        callback=profile.edit_your_cuisine_pref,
                         pattern="food_pref"
                     ),
                     CallbackQueryHandler(
-                        callback=home.not_implemented_yet,
+                        callback=profile.choose_buddy_age_pref,
                         pattern="buddy_pref"
-                    )
+                    ),
             ],
             "NEW_CHOOSING_AGE": [
                 CallbackQueryHandler(
@@ -70,26 +70,41 @@ def main() -> None:
             ],
             "CHOOSING_CUISINE": [
                 CallbackQueryHandler(
-                    callback=profile.edit_your_dietary_pref,
-                    pattern="Chinese|Malay|Indian|Western"
+                    callback=profile.handle_choosing_cuisine__edit_diet,
+                    pattern="1|2|3|4|5|6|7|8|Select All|Done"
                 )
             ],
             "CHOOSING_DIET": [
                 CallbackQueryHandler(
-                    callback=profile.edit_your_age,
-                    pattern="yourinfo"
+                    callback=profile.handle_choosing_diet__home,
+                    pattern="1|2|3|Select All|Done"
                 )
             ],
+            "CHOOSING_BUDDY_AGE": [
+                CallbackQueryHandler(
+                    callback=profile.handle_buddy_age__buddy_gender,
+                    pattern="1|2|3|4|5|6|Select All|Done"
+                )
+            ],
+            "CHOOSING_BUDDY_GENDER": [
+                CallbackQueryHandler(
+                    callback=profile.handle_buddy_gender__home,
+                    pattern="1|2|3|Select All|Done"
+                )
+            ]
         },
         fallbacks=[CommandHandler("start", home.start)],
         name="profile_conversation",
         persistent=False,
+        allow_reentry=True
     )
 
 
     # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
     home_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", home.start)],
+        entry_points=[CommandHandler("start", home.start),
+                      CallbackQueryHandler(callback=home.start,
+                                           pattern="home")],
         states={
             "HOME_START": [
                 CallbackQueryHandler(
@@ -101,6 +116,7 @@ def main() -> None:
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
         name="home_conversation",
         persistent=False,
+        allow_reentry=True
     )
 
     application.add_handler(home_handler)
