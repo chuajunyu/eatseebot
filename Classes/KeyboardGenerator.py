@@ -10,6 +10,7 @@ class KeyboardGenerator:
     def generate_keyboard(self, choices, selected=[], selected_icon='\u2705'):  # ✅  
         keyboard = list()
         row = list()
+        # print(selected)
         for choice in choices.items():
             callback_data, option = choice
 

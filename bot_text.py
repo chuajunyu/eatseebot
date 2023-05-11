@@ -33,13 +33,13 @@ choose_age_text = "Enter your age range!"
 
 choose_gender_text = "Enter your gender!"
 
-choose_cuisine_text = "Pick the following cuisines that you like!"
+choose_multi_cuisine = "Pick the following cuisines that you like!"
 
-choose_diet_text = "Enter any dietary restrictions you may have"
+choose_multi_diet = "Enter any dietary restrictions you may have"
 
-choose_buddy_age = "Pick the age ranges you would like your Eatsee buddy to fall into!"
+choose_multi_age = "Pick the age ranges you would like your Eatsee buddy to fall into!"
 
-choose_buddy_gender = "Pick the genders you would like your Eatsee buddy to fall into!"
+choose_multi_gender = "Pick the genders you would like your Eatsee buddy to fall into!"
 
 
 profile = """What would you like to edit?

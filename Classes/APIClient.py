@@ -125,6 +125,7 @@ class APIClient(metaclass = Singleton):
     
     def show_diet_choices(self):
         response = self.api_post("/show_diet_choices/")
+        print(response.json())
         return response.json()
     
     

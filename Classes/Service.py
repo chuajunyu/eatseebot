@@ -40,28 +40,28 @@ class Service:
     def select_user_age_pref(self, telename):
         response = self.api_client.select_age_preference(telename)
         if response["code"] == 200:
-            return response["data"]
+            return [str(i) for i in response["data"]]
         else:
             return False
         
     def select_user_gender_pref(self, telename):
         response = self.api_client.select_gender_preference(telename)
         if response["code"] == 200:
-            return response["data"]
+            return [str(i) for i in response["data"]]
         else:
             return False
     
     def select_user_cuisine_pref(self, telename):
         response = self.api_client.select_cuisine_preference(telename)
         if response["code"] == 200:
-            return response["data"]
+            return [str(i) for i in response["data"]]
         else:
             return False
         
     def select_user_diet_pref(self, telename):
         response = self.api_client.select_diet_preference(telename)
         if response["code"] == 200:
-            return response["data"]
+            return [str(i) for i in response["data"]]
         else:
             return False
         

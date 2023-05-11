@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 from telegram.ext import *
 from telegram import *
 
@@ -22,17 +23,22 @@ class Home:
         if type(selected) == int:
             return f"_{choice_dict[str(selected)]}_"
         output = ""
+        selected.sort()
         for i in selected:
             output += f"_{choice_dict[str(i)]}_, "
         output = output.strip(", ")
         return output
 
-    async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE, is_redirect=True):
         # Check whether their profile exists inside the database
         telename = update.effective_chat.username
 
         if self.service.is_user_existing(telename):
             data = self.service.show_profile(telename)
+
+            if not is_redirect:
+                query = update.callback_query
+                await context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.id)
 
             message = bot_text.home_existing_user.format(telename,
                                               self.convert_to_text(data["age"], self.age_choices),
@@ -60,8 +66,12 @@ class Home:
                                            reply_markup=markup, parse_mode='Markdown')
             
             return "HOME_START"
+        
+    async def back_to_start(self, update, context):
+        return await self.start(update, context, is_redirect=False)
     
     async def not_implemented_yet(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=update.effective_chat.id, 
                                     text="Sorry we did not implement this yet :p, go back to /start :p")
         return
+    
