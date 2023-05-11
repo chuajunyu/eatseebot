@@ -8,9 +8,19 @@ class KeyboardGenerator:
         self.max_width = 2
 
     def generate_keyboard(self, choices, selected=[], selected_icon='\u2705'):  # ✅  
+        """Generates an inline keyboard automatically.
+        Accomodates multi option inline keyboards by printing the ✅ icon (or any unicode icon) 
+        beside all options specified under the selected list.
+        
+        Input:
+            [choices]: Dictionary representing key value pairs of callback data to option text
+            [selected]: List of string representing the options that have been selected by the user
+            [selected_icon]: String representing the unicode code for the icon beside selected options
+                             Defaulted to ✅
+
+        """
         keyboard = list()
         row = list()
-        # print(selected)
         for choice in choices.items():
             callback_data, option = choice
 
@@ -31,5 +41,3 @@ class KeyboardGenerator:
 
         markup = InlineKeyboardMarkup(keyboard)
         return markup
-
-

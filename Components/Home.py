@@ -20,6 +20,16 @@ class Home:
         self.diet_choices = self.service.get_diet_choices()
 
     def convert_to_text(self, selected, choice_dict):
+        """Looks up a list of keys for selected options, and converts it to a readable string
+
+        Input:
+            [selected]: List of strings representing the keys in the choice dictionary
+            [choice_dict]: Dictionary with keys corresponding to the selected list
+
+        Return:
+            [output]: String representing the selected options in human readable format
+    
+        """
         if type(selected) == int:
             return f"_{choice_dict[str(selected)]}_"
         output = ""
@@ -30,16 +40,26 @@ class Home:
         return output
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE, is_redirect=True):
-        # Check whether their profile exists inside the database
+        """Home starting page for all users. Checks if user exists, if they do not, then redirect
+        them to profile creation, else offer them options to edit profile or find a match!
+
+        Input:
+            [update]: Python Telegram Bot update object
+            [context]: Python Telegram Bot context object
+            [is_redirect]: Boolean representing if user has been redirected to home or they willingly
+                           pressed a button to return to home.
+        
+        """
         telename = update.effective_chat.username
 
-        if self.service.is_user_existing(telename):
+        if self.service.is_user_existing(telename):  # For existing users
             data = self.service.show_profile(telename)
 
-            if not is_redirect:
+            if not is_redirect:  # If willingly pressed a button, then delete the previous message
                 query = update.callback_query
                 await context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.id)
 
+            # Generate a message with users current profile information for ease of viewing
             message = bot_text.home_existing_user.format(telename,
                                               self.convert_to_text(data["age"], self.age_choices),
                                               self.convert_to_text(data["gender"], self.gender_choices),
@@ -57,7 +77,7 @@ class Home:
             await context.bot.send_message(chat_id=update.effective_chat.id, text=message, 
                                            reply_markup=markup, parse_mode='Markdown')
             return "HOME_START"  # state
-        else:
+        else:  # For new users
             inline_keyboard = [
                 [InlineKeyboardButton('Create a new profile!', callback_data="new_profile")]
             ]
@@ -68,6 +88,7 @@ class Home:
             return "HOME_START"
         
     async def back_to_start(self, update, context):
+        """Function that calls the Home starting page, this should be called for back to start button calls"""
         return await self.start(update, context, is_redirect=False)
     
     async def not_implemented_yet(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
