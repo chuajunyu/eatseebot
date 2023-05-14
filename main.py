@@ -73,7 +73,7 @@ def main() -> None:
 
     # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
     home_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", home.start)],
+        entry_points=[CommandHandler("start", home.start), CallbackQueryHandler(home.start, pattern = "home")],
         states={
 
         },
@@ -86,10 +86,6 @@ def main() -> None:
     match_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(match.queue, pattern = "queue")],
         states={
-            "MATCH": [
-                CallbackQueryHandler(match.matching),
-                
-            ],
             "MATCHED": [
                 
                 MessageHandler(filters = None, callback = match.chat),

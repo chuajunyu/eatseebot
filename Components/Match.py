@@ -11,7 +11,8 @@ class Match:
     def __init__(self):
         self.service = Service()
         
-        self.partner = None
+        
+        
         
     
     async def queue(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -21,13 +22,22 @@ class Match:
             
             await context.bot.send_message(chat_id=update.effective_chat.id, 
                                     text="Matching...")
+            await self.matching(update, context)
             
-            return "MATCH"
+            return None
         else:
-            await context.bot.send_message(chat_id=update.effective_chat.id, 
-                                    text="Oops something went wrong, try again?")
-            return "DEQUEUE"
-        
+            await self.dequeue(update, context)
+            inline_keyboard = [
+            [InlineKeyboardButton('Try again', callback_data='queue')]
+            ]
+            markup = InlineKeyboardMarkup(inline_keyboard)
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="Oops something went wrong, try again?", reply_markup=markup)
+            
+            
+            return None
+    
+    
+    
     async def matching(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         telename = update.effective_chat.username
         start = time.time()
@@ -42,17 +52,17 @@ class Match:
                                                 )
                 await context.bot.send_message(chat_id=update.effective_chat.id, 
                                         text= message )
-                self.partner = userid[1]
+                
                 return "MATCHED"
                 
             
-         
+        await self.dequeue(update, context)
         inline_keyboard = [
-            [InlineKeyboardButton('Return to home', callback_data='dequeue')]
+            [InlineKeyboardButton('Return to home', callback_data='home')]
         ]
         markup = InlineKeyboardMarkup(inline_keyboard)
         await context.bot.send_message(chat_id=update.effective_chat.id, text="No matches found for u :(", reply_markup=markup)
-        return "DEQUEUE"
+        return ConversationHandler.END
     
 
     async def dequeue(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -71,4 +81,9 @@ class Match:
 
     async def chat(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         telename = update.effective_chat.username
-        await context.bot.send_message(chat_id = "@" + self.partner, text = context.bot.message(from_user = "@" + telename))
+        user_id = self.service.get_user_id(telename)
+        partner_id = self.service.select_chatroom_user(user_id)
+        if partner_id == None:
+            partner_id = self.service.select_chatroom(user_id)
+        partner_telename = self.service.show_profile(partner_id)["telename"]
+        await context.bot.send_message(chat_id = "@" + partner_telename, text = context.bot.message(from_user = "@" + telename))

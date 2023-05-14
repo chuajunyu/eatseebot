@@ -100,5 +100,33 @@ class APIClient(metaclass = Singleton):
         }
         response = self.api_post("/match/", data=data)
         return response.json()
-
     
+
+    def add_chatroom_user(self, chatroom_id: int, user_id: list[int]):
+        data = {
+            "chatroom_id" : chatroom_id,
+            "user_id" : user_id
+        }
+        response = self.api_post("/add_chatroom_user/", data=data)
+        return response.json()
+
+    def delete_chatroom_user(self, user_id: list[int]):
+        data = {
+            "user_id" : user_id
+        }
+        response = self.api_post("/delete_chatroom_user/", data=data)
+        return response.json()
+
+    def select_chatroom_user(self, chatroom_id : int):
+        data = {
+            "chatroom_id" : chatroom_id
+        }
+        response = self.api_post("/select_chatroom_user/", data=data)
+        return response.json()
+    
+    def select_chatroom(self, chatroom_id: int):
+        data = {
+            "chatroom_id" : chatroom_id
+        }
+        response = self.api_post("/select_chatroom/", data=data)
+        return response.json()
