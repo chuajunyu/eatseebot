@@ -13,7 +13,6 @@ class Home:
     """
     def __init__(self):
         self.service = Service()
-
         self.age_choices = self.service.get_age_choices()
         self.gender_choices = self.service.get_gender_choices()
         self.cuisine_choices = self.service.get_cuisine_choices()

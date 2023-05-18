@@ -1,18 +1,17 @@
 import logging
 
 from Classes import *
-from Components import *
-
+from Components import * 
+from Components import Match
 from telegram.ext import *
 from telegram import *
 
 
 config = ConfigManager("dev.config")
 api_key = config.get("telegram_key")
-
 home = Home()
 profile = Profile()
-
+match = Match.Match()
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
@@ -106,22 +105,37 @@ def main() -> None:
                       CallbackQueryHandler(callback=home.back_to_start,
                                            pattern="home")],
         states={
-            "HOME_START": [
-                CallbackQueryHandler(
-                    callback=home.not_implemented_yet,
-                    pattern="match"
-                )
-            ],
+            "HOME_START": [CallbackQueryHandler(callback=home.back_to_start,
+                                           pattern="home")]
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
-        name="home_conversation",
+        name="match_conversation",
+        persistent=False,
+    )
+
+
+    match_handler = ConversationHandler(
+        entry_points=[CallbackQueryHandler(match.queue, pattern = "match")],
+        states={
+            "MATCHED": [
+                
+                MessageHandler(filters = None, callback = match.chat),
+                CommandHandler("end", match.dequeue)
+            ],
+            "DEQUEUE": [
+                CallbackQueryHandler(match.dequeue)
+            ]
+            
+        },
+        fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
+        name="match_conversation",
         persistent=False,
         allow_reentry=True
     )
 
     application.add_handler(home_handler)
     application.add_handler(profile_handler)
-
+    application.add_handler(match_handler)
     # Run the bot until the user presses Ctrl-C
     application.run_polling()
 
