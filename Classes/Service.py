@@ -22,8 +22,8 @@ class Service:
         elif response["code"] == 200:
             return True
         
-    def create_user(self, telename, age, gender):
-        response = self.api_client.create_user(True, telename, age, gender)
+    def create_user(self, chat_id, telename, age, gender):
+        response = self.api_client.create_user(chat_id, telename, age, gender)
         if response["code"] == 200:
             return True
         else:

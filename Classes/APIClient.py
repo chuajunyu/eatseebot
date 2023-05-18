@@ -39,9 +39,9 @@ class APIClient(metaclass = Singleton):
     def check_server_status(self):
         return self.api_get("/")
 
-    def create_user(self, availability: bool, telename: str, age: int, gender: int):
+    def create_user(self, chat_id, telename: str, age: int, gender: int):
         data = {
-            "availability": availability,
+            "id": chat_id,
             "telename": telename,
             "age": age,
             "gender": gender

@@ -140,9 +140,10 @@ class Profile:
                                             chat_id=query.message.chat_id, message_id=query.message.id)
         
         telename = update.effective_chat.username
+        chat_id = update.effective_chat.id
         
         if not self.service.is_user_existing(telename):  # Perform API Call to insert User into the Database
-            if self.service.create_user(telename,
+            if self.service.create_user(chat_id, telename,
                                      context.user_data['age'],  
                                      context.user_data['gender']):
                 await context.bot.send_message(text=f"Welcome {telename}! Your profile has been successfully created!",
