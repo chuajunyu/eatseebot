@@ -122,9 +122,7 @@ def main() -> None:
                 MessageHandler(filters = None, callback = match.chat),
                 CommandHandler("end", match.dequeue)
             ],
-            "DEQUEUE": [
-                CallbackQueryHandler(match.dequeue)
-            ]
+
             
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],

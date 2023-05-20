@@ -10,6 +10,7 @@ class Match:
     
     def __init__(self):
         self.service = Service()
+        self.state = True
         
     
     async def matching(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -22,7 +23,7 @@ class Match:
         #when match failed
         #keep running _function to check if telename in queue is matched
             start = time.time()
-            while(time.time() - start <20):
+            while(time.time() - start <20) and self.state:
                 
                 if not self.service.check_queue(chat_id):
                     #not found in table means matched
@@ -44,7 +45,7 @@ class Match:
         if self.service.dequeue_user(chat_id):
             
             await context.bot.send_message(chat_id=update.effective_chat.id, 
-                                    text="YOU HAVE BEEN DEQUEUED")
+                                    text="CHAT END")
             
             return ConversationHandler.END
         else:
@@ -58,5 +59,6 @@ class Match:
         chatroom_id = self.service.select_chatroom(chat_id)
         partner_id = self.service.select_chatroom_user(chatroom_id)[0]
         await context.bot.send_message(chat_id = partner_id, text = update.message["text"])
+        return "Matched"
         #for more than 2 ppl matching next time
         #if len(partner_id) > 1:
