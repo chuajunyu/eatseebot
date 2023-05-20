@@ -54,6 +54,7 @@ class APIClient(metaclass = Singleton):
             "telename": telename
         }
         response = self.api_post(url, data=data)
+        print(response.json(), "from apiclient get user info")
         return response.json()
 
     def show_profile(self, telename:str):
@@ -128,25 +129,25 @@ class APIClient(metaclass = Singleton):
         print(response.json())
         return response.json()
     
-    def queue(self, telename:str):
+    def queue(self, user_id: int):
         data = {
-            "telename": telename
+            "user_id": user_id
         }
         response = self.api_post("/queue/", data=data)
         
         
         return response.json()
     
-    def dequeue(self, telename:str):
+    def dequeue(self, user_id:int):
         data = {
-            "telename": telename
+            "user_id" : user_id
         }
         response = self.api_post("/dequeue/", data=data)
         return response.json()
 
-    def match(self, telename:str):
+    def match(self, user_id:int):
         data = {
-            "telename": telename
+            "user_id" : user_id
         }
         response = self.api_post("/match/", data=data)
         return response.json()
@@ -178,4 +179,11 @@ class APIClient(metaclass = Singleton):
             "chatroom_id" : chatroom_id
         }
         response = self.api_post("/select_chatroom/", data=data)
+        return response.json()
+    
+    def check_queue(self, user_id: int):
+        data = {
+            "user_id" : user_id
+        }
+        response = self.api_post("/check_queue_for_user/", data=data)
         return response.json()

@@ -115,7 +115,7 @@ def main() -> None:
 
 
     match_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(match.queue, pattern = "match")],
+        entry_points=[CallbackQueryHandler(match.matching, pattern = "match")],
         states={
             "MATCHED": [
                 

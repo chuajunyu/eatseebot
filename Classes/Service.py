@@ -42,6 +42,7 @@ class Service:
         
     def show_profile(self, telename):
         response = self.api_client.show_profile(telename)
+        print (response)
         if response["code"] == 200:
             data = response["data"]
             return data
@@ -151,23 +152,23 @@ class Service:
             return False
     
         
-    def queue_user(self, telename):
-        response = self.api_client.queue(telename)
+    def queue_user(self, user_id):
+        response = self.api_client.queue(user_id)
         
         if response["code"] == 200:
             return True
         else:
             return False
     
-    def dequeue_user(self, telename):
-        response = self.api_client.dequeue(telename)
+    def dequeue_user(self, user_id):
+        response = self.api_client.dequeue(user_id)
         if response["code"] == 200:
             return True
         else:
             return False
         
-    def match_user(self, telename):
-        response = self.api_client.match(telename)
+    def match_user(self, user_id):
+        response = self.api_client.match(user_id)
         if response["code"] == 200:
             data = response["data"]
             return data
@@ -201,6 +202,13 @@ class Service:
         if response["code"] == 200:
             data = response["data"]
             return data
+        else:
+            return False
+    
+    def check_queue(self, user_id):
+        response = self.api_client.check_queue(user_id)
+        if response["code"] == 200:
+            return True
         else:
             return False
 
