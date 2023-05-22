@@ -99,7 +99,6 @@ def main() -> None:
     )
 
 
-    # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
     home_handler = ConversationHandler(
         entry_points=[CommandHandler("start", home.start),
                       CallbackQueryHandler(callback=home.back_to_start,
@@ -111,6 +110,7 @@ def main() -> None:
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
         name="match_conversation",
         persistent=False,
+        allow_reentry=True
     )
 
 

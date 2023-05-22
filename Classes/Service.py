@@ -15,63 +15,68 @@ class Service:
         self.keyboard_generator = KeyboardGenerator()
         self.cache = dict()
 
-    def is_user_existing(self, telename):
-        response = self.api_client.get_user_id(telename)
-        
-        
-        if response["code"] == 404:
-            return False
-        elif response["code"] == 200:
-            return True
+    def is_user_existing(self, user_id):
+        response = self.api_client.check_users_for_user(user_id)
+        if response["code"] == 200:
+            return response["data"]
+
     def get_user_id(self, telename):
         response = self.api_client.get_user_id(telename)
-        
-        
         if response["code"] == 404:
             return False
         elif response["code"] == 200:
             data = response["data"]
             return data
         
-    def create_user(self, chat_id, telename, age, gender):
-        response = self.api_client.create_user(chat_id, telename, age, gender)
+    def create_user(self, user_id, telename, age, gender):
+        response = self.api_client.create_user(user_id, telename, age, gender)
         if response["code"] == 200:
             return True
         else:
             return False
         
-    def show_profile(self, telename):
-        response = self.api_client.show_profile(telename)
-        print (response)
+    def show_profile(self, user_id):
+        response = self.api_client.show_profile(user_id)
         if response["code"] == 200:
             data = response["data"]
             return data
         else:
             return False
            
-    def select_user_age_pref(self, telename):
-        response = self.api_client.select_age_preference(telename)
+    def select_user_age_pref(self, user_id):
+        """Select the age preferences of the user
+        
+        Args:
+            user_id: Telegram chat id between bot and user
+
+        Returns:
+            List of integer in string format
+
+        String format because of the dict output of get_{type}_choices
+        has string integers as keys and we need to match those
+        """
+        response = self.api_client.select_age_preference(user_id)
         if response["code"] == 200:
             return [str(i) for i in response["data"]]
         else:
             return False
         
-    def select_user_gender_pref(self, telename):
-        response = self.api_client.select_gender_preference(telename)
+    def select_user_gender_pref(self, user_id):
+        response = self.api_client.select_gender_preference(user_id)
         if response["code"] == 200:
             return [str(i) for i in response["data"]]
         else:
             return False
     
-    def select_user_cuisine_pref(self, telename):
-        response = self.api_client.select_cuisine_preference(telename)
+    def select_user_cuisine_pref(self, user_id):
+        response = self.api_client.select_cuisine_preference(user_id)
         if response["code"] == 200:
             return [str(i) for i in response["data"]]
         else:
             return False
         
-    def select_user_diet_pref(self, telename):
-        response = self.api_client.select_diet_preference(telename)
+    def select_user_diet_pref(self, user_id):
+        response = self.api_client.select_diet_preference(user_id)
         if response["code"] == 200:
             return [str(i) for i in response["data"]]
         else:
@@ -109,43 +114,43 @@ class Service:
             if response["code"] == 200:
                 return response["data"]["diet"]
             
-    def change_age(self, telename, age):
-        response = self.api_client.change_age(telename, age)
+    def change_age(self, user_id, age):
+        response = self.api_client.change_age(user_id, age)
         if response["code"] == 200:
             return True
         else:
             return False
         
-    def change_gender(self, telename, gender):
-        response = self.api_client.change_gender(telename, gender)
+    def change_gender(self, user_id, gender):
+        response = self.api_client.change_gender(user_id, gender)
         if response["code"] == 200:
             return True
         else:
             return False
         
-    def change_age_preferences(self, telename, preferences):
-        response = self.api_client.change_age_preferences(telename, preferences)
+    def change_age_preferences(self, user_id, preferences):
+        response = self.api_client.change_age_preferences(user_id, preferences)
         if response["code"] == 200:
             return True
         else:
             return False
     
-    def change_gender_preferences(self, telename, preferences):
-        response = self.api_client.change_gender_preferences(telename, preferences)
+    def change_gender_preferences(self, user_id, preferences):
+        response = self.api_client.change_gender_preferences(user_id, preferences)
         if response["code"] == 200:
             return True
         else:
             return False
     
-    def change_cuisine_preferences(self, telename, preferences):
-        response = self.api_client.change_cuisine_preferences(telename, preferences)
+    def change_cuisine_preferences(self, user_id, preferences):
+        response = self.api_client.change_cuisine_preferences(user_id, preferences)
         if response["code"] == 200:
             return True
         else:
             return False
     
-    def change_diet_preferences(self, telename, preferences):
-        response = self.api_client.change_diet_preferences(telename, preferences)
+    def change_diet_preferences(self, user_id, preferences):
+        response = self.api_client.change_diet_preferences(user_id, preferences)
         if response["code"] == 200:
             return True
         else:

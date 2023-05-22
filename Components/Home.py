@@ -51,8 +51,10 @@ class Home:
         """
         telename = update.effective_chat.username
 
-        if self.service.is_user_existing(telename):  # For existing users
-            data = self.service.show_profile(telename)
+        chat_id = update.effective_chat.id
+
+        if self.service.is_user_existing(chat_id):  # For existing users
+            data = self.service.show_profile(chat_id)
 
             if not is_redirect:  # If willingly pressed a button, then delete the previous message
                 query = update.callback_query
@@ -77,11 +79,16 @@ class Home:
                                            reply_markup=markup, parse_mode='Markdown')
             return "HOME_START"  # state
         else:  # For new users
+            if telename is None:
+                await context.bot.send_message(chat_id=update.effective_chat.id, text="You don't have a telegram username! Please register one!", 
+                                     parse_mode='Markdown')
+                return ConversationHandler.END
+
             inline_keyboard = [
                 [InlineKeyboardButton('Create a new profile!', callback_data="new_profile")]
             ]
             markup = InlineKeyboardMarkup(inline_keyboard)
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="You don't have an existing user in our db", 
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not an existing user!", 
                                            reply_markup=markup, parse_mode='Markdown')
             
             return "HOME_START"
