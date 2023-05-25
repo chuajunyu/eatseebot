@@ -2,7 +2,6 @@ import logging
 
 from Classes import *
 from Components import * 
-from Components import Match
 from telegram.ext import *
 from telegram import *
 
@@ -11,16 +10,32 @@ config = ConfigManager("dev.config")
 api_key = config.get("telegram_key")
 home = Home()
 profile = Profile()
-match = Match.Match()
+match = Match()
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
+
+
 def main() -> None:
     """Run the bot."""
     # Create the Application and pass it your bot's token.
     application = ApplicationBuilder().token(api_key).build()
+
+    home_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", home.start),
+                      CallbackQueryHandler(callback=home.back_to_start,
+                                           pattern="home")],
+        states={
+            "HOME_START": [CallbackQueryHandler(callback=home.back_to_start,
+                                           pattern="home")]
+        },
+        fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
+        name="match_conversation",
+        persistent=False,
+        allow_reentry=True
+    )
 
     profile_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(callback=profile.profile_home,
@@ -98,32 +113,14 @@ def main() -> None:
         allow_reentry=True
     )
 
-
-    home_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", home.start),
-                      CallbackQueryHandler(callback=home.back_to_start,
-                                           pattern="home")],
-        states={
-            "HOME_START": [CallbackQueryHandler(callback=home.back_to_start,
-                                           pattern="home")]
-        },
-        fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
-        name="match_conversation",
-        persistent=False,
-        allow_reentry=True
-    )
-
-
     match_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(match.matching, pattern = "match")],
+        entry_points=[CallbackQueryHandler(match.find_match, pattern = "match", block=False),
+                      CallbackQueryHandler(match.dequeue, pattern="dequeue", block=False)],
         states={
             "MATCHED": [
-                
                 MessageHandler(filters = None, callback = match.chat),
                 CommandHandler("end", match.dequeue)
             ],
-
-            
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
         name="match_conversation",
@@ -134,8 +131,11 @@ def main() -> None:
     application.add_handler(home_handler)
     application.add_handler(profile_handler)
     application.add_handler(match_handler)
-    # Run the bot until the user presses Ctrl-C
+
+    # application.add_handler(CallbackQueryHandler(match.find_match, pattern='match', block=False))
+    application.add_handler(CallbackQueryHandler(match.dequeue, pattern='dequeue', block=False))
     application.run_polling()
 
 if __name__ == '__main__':
+    count = True
     main()

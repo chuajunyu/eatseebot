@@ -49,6 +49,7 @@ class APIClient(metaclass = Singleton):
             "gender": gender
         }
         response = self.api_post("/create_user/", data=data)
+        print(response)
         return response.json()
     
     def get_user_id(self, telename:str):
@@ -76,6 +77,12 @@ class APIClient(metaclass = Singleton):
 
     def check_users_for_user(self, user_id):
         return self.__get_user_info(user_id, "/check_users_for_user/")
+    
+    def check_queue_for_user(self, user_id):
+        return self.__get_user_info(user_id, "/check_queue_for_user/")
+    
+    def check_chat_for_user(self, user_id):
+        return self.__get_user_info(user_id, "/check_chat_for_user/")
 
     def show_profile(self, user_id):
         return self.__get_user_info(user_id, "/show_profile/")
@@ -206,13 +213,4 @@ class APIClient(metaclass = Singleton):
         response = self.api_post("/select_chatroom/", data=data)
         return response.json()
     
-    def check_queue(self, user_id: int):
-        # Yujia can group this on top together with the
-        # __get_user_info generic function, i made a check user one
-        # refer to that
-
-        data = {
-            "user_id" : user_id
-        }
-        response = self.api_post("/check_queue_for_user/", data=data)
-        return response.json()
+    

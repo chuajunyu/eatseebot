@@ -210,10 +210,14 @@ class Service:
         else:
             return False
     
-    def check_queue(self, user_id):
-        response = self.api_client.check_queue(user_id)
+    def is_user_in_queue(self, user_id):
+        response = self.api_client.check_queue_for_user(user_id)
         if response["code"] == 200:
-            return True
-        else:
-            return False
+            return response["data"]
+
+    def is_user_in_chat(self, user_id):
+        response = self.api_client.check_chat_for_user(user_id)
+        if response["code"] == 200:
+            return response["data"]
+
 
