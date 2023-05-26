@@ -114,13 +114,23 @@ def main() -> None:
     )
 
     match_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(match.find_match, pattern = "match", block=False),
+        entry_points=[CallbackQueryHandler(match.find_match, pattern="match", block=False),
                       CallbackQueryHandler(match.dequeue, pattern="dequeue", block=False)],
         states={
             "MATCHED": [
+                CommandHandler("options", match.options),
                 MessageHandler(filters = None, callback = match.chat),
-                CommandHandler("end", match.dequeue)
+                CallbackQueryHandler(match.report, pattern="report"),
+                CallbackQueryHandler(match.find_match, pattern="find_match")
             ],
+            "OPTIONS": [
+                CallbackQueryHandler(match.find_food, pattern="find_food", block=False),
+                CallbackQueryHandler(match.leave_chat, pattern="leave_chat", block=False)
+            ],
+            "POST_CHAT": [
+                CallbackQueryHandler(match.report, pattern="report", block=False),
+                CallbackQueryHandler(match.find_match, pattern="find_match", block=False)
+            ]
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
         name="match_conversation",
@@ -132,7 +142,6 @@ def main() -> None:
     application.add_handler(profile_handler)
     application.add_handler(match_handler)
 
-    # application.add_handler(CallbackQueryHandler(match.find_match, pattern='match', block=False))
     application.add_handler(CallbackQueryHandler(match.dequeue, pattern='dequeue', block=False))
     application.run_polling()
 

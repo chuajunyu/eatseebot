@@ -58,7 +58,7 @@ class Home:
 
             if not is_redirect:  # If willingly pressed a button, then delete the previous message
                 query = update.callback_query
-                await context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.id)
+                await context.bot.edit_message_reply_markup(chat_id=query.message.chat_id, message_id=query.message.id)
 
             # Generate a message with users current profile information for ease of viewing
             message = bot_text.home_existing_user.format(telename,

@@ -156,10 +156,8 @@ class Service:
         else:
             return False
     
-        
     def queue_user(self, user_id):
         response = self.api_client.queue(user_id)
-        
         if response["code"] == 200:
             return True
         else:
@@ -188,7 +186,7 @@ class Service:
             return False
         
     def delete_chatroom_user(self, user_id):
-        response = self.api_client.delete_chatroom_user_chatroom_user(user_id)
+        response = self.api_client.delete_chatroom_user([user_id])
         if response["code"] == 200:
             return True
         else:

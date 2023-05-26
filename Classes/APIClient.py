@@ -192,9 +192,9 @@ class APIClient(metaclass = Singleton):
         response = self.api_post("/add_chatroom_user/", data=data)
         return response.json()
 
-    def delete_chatroom_user(self, user_id: list[int]):
+    def delete_chatroom_user(self, user_id_list: list[int]):
         data = {
-            "user_id" : user_id
+            "user_id_list" : user_id_list
         }
         response = self.api_post("/delete_chatroom_user/", data=data)
         return response.json()
