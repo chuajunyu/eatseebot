@@ -18,6 +18,7 @@ class Profile:
         # Pre-Fetching the choices from the API
         self.age_choices = self.service.get_age_choices()
         self.gender_choices = self.service.get_gender_choices()
+        self.pax_choices = self.service.get_pax_choices()
         self.cuisine_choices = self.service.get_cuisine_choices()
         self.diet_choices = self.service.get_diet_choices()
 
@@ -113,6 +114,11 @@ class Profile:
                               edit=False, special_text=None):
         """Generates multi input inline keyboard to take in diet input"""
         await self.multi_option_input(update, context, "diet", selected, edit=edit, special_text=special_text)
+
+    async def multi_pax_input(self, update: Update, context: ContextTypes.DEFAULT_TYPE, selected, 
+                              edit=False, special_text=None):
+        """Generates multi input inline keyboard to take in pax input"""
+        await self.multi_option_input(update, context, "pax", selected, edit=edit, special_text=special_text)
 
     async def new_user_age(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Function to generate a single input age range input for new user creation"""
@@ -236,12 +242,27 @@ class Profile:
         context.user_data["gender"] = selected
         await self.multi_gender_input(update, context, selected)
 
-    async def handle_buddy_gender__home(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def handle_buddy_gender__buddy_pax(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles multi gender input and calls the api to update, then returns to profile home"""
+        async def done():
+            await self.choose_buddy_pax(update, context)
+        
+        return await self.general_multi_handler(update, context, "gender", "CHOOSING_BUDDY_GENDER", 
+                                                "CHOOSING_BUDDY_PAX", done_function=done)
+    
+    async def choose_buddy_pax(self, update: Update, context: ContextTypes.DEFAULT_TYPE):  
+        """Function to generate a multi input pax input to enter buddy pax preference"""    
+        chat_id = update.effective_chat.id
+        selected = self.service.select_user_pax_pref(chat_id)
+        context.user_data["pax"] = selected
+        await self.multi_pax_input(update, context, selected)
+
+    async def handle_buddy_pax__home(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles multi gender input and calls the api to update, then returns to profile home"""
         async def done():
             await self.profile_home(update, context, is_redirect=True)
         
-        return await self.general_multi_handler(update, context, "gender", "CHOOSING_BUDDY_GENDER", 
+        return await self.general_multi_handler(update, context, "pax", "CHOOSING_BUDDY_PAX", 
                                                 "PROFILE_HOME", done_function=done)
 
     async def edit_your_cuisine_pref(self, update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -91,7 +91,7 @@ def main() -> None:
             "CHOOSING_DIET": [
                 CallbackQueryHandler(
                     callback=profile.handle_choosing_diet__home,
-                    pattern="1|2|3|Select All|Done"
+                    pattern="1|2|3|4|5|6|Select All|Done"
                 )
             ],
             "CHOOSING_BUDDY_AGE": [
@@ -102,8 +102,14 @@ def main() -> None:
             ],
             "CHOOSING_BUDDY_GENDER": [
                 CallbackQueryHandler(
-                    callback=profile.handle_buddy_gender__home,
+                    callback=profile.handle_buddy_gender__buddy_pax,
                     pattern="1|2|3|Select All|Done"
+                )
+            ],
+            "CHOOSING_BUDDY_PAX": [
+                CallbackQueryHandler(
+                    callback=profile.handle_buddy_pax__home,
+                    pattern="2|3|4|5|6|Select All|Done"
                 )
             ]
         },

@@ -15,8 +15,10 @@ class Home:
         self.service = Service()
         self.age_choices = self.service.get_age_choices()
         self.gender_choices = self.service.get_gender_choices()
+        self.pax_choices = self.service.get_pax_choices()
         self.cuisine_choices = self.service.get_cuisine_choices()
         self.diet_choices = self.service.get_diet_choices()
+        
 
     def convert_to_text(self, selected, choice_dict):
         """Looks up a list of keys for selected options, and converts it to a readable string
@@ -66,6 +68,7 @@ class Home:
                                               self.convert_to_text(data["gender"], self.gender_choices),
                                               self.convert_to_text(data["age pref"], self.age_choices),
                                               self.convert_to_text(data["gender pref"], self.gender_choices),
+                                              self.convert_to_text(data["pax pref"], self.pax_choices),
                                               self.convert_to_text(data["cuisine pref"], self.cuisine_choices),
                                               self.convert_to_text(data["diet pref"], self.diet_choices)
                                               )

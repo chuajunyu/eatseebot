@@ -43,13 +43,12 @@ class APIClient(metaclass = Singleton):
 
     def create_user(self, chat_id, telename: str, age: int, gender: int):
         data = {
-            "id": chat_id,
+            "user_id": chat_id,
             "telename": telename,
             "age": age,
             "gender": gender
         }
         response = self.api_post("/create_user/", data=data)
-        print(response)
         return response.json()
     
     def get_user_id(self, telename:str):
@@ -98,6 +97,9 @@ class APIClient(metaclass = Singleton):
     
     def select_diet_preference(self, user_id):
         return self.__get_user_info(user_id, "/select_diet_preferences/")
+    
+    def select_pax_preference(self, user_id):
+        return self.__get_user_info(user_id, "/select_pax_preferences/")
 
     def change_age(self, user_id, age):
         data = {
@@ -145,6 +147,9 @@ class APIClient(metaclass = Singleton):
 
     def change_diet_preferences(self, user_id, preferences):
         return self.__change_preferences(user_id, preferences, "/change_diet_preferences/")
+    
+    def change_pax_preferences(self, user_id, preferences):
+        return self.__change_preferences(user_id, preferences, "/change_pax_preferences/")
 
     def show_age_choices(self):
         response = self.api_post("/show_age_choices/")
@@ -160,7 +165,10 @@ class APIClient(metaclass = Singleton):
     
     def show_diet_choices(self):
         response = self.api_post("/show_diet_choices/")
-        print(response.json())
+        return response.json()
+    
+    def show_pax_choices(self):
+        response = self.api_post("/show_pax_choices/")
         return response.json()
     
     def queue(self, user_id: int):
@@ -208,9 +216,7 @@ class APIClient(metaclass = Singleton):
     
     def select_chatroom(self, chatroom_id: int):
         data = {
-            "chatroom_id" : chatroom_id
+            "user_id" : chatroom_id
         }
         response = self.api_post("/select_chatroom/", data=data)
         return response.json()
-    
-    

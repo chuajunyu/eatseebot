@@ -82,6 +82,13 @@ class Service:
         else:
             return False
         
+    def select_user_pax_pref(self, user_id):
+        response = self.api_client.select_pax_preference(user_id)
+        if response["code"] == 200:
+            return [str(i) for i in response["data"]]
+        else:
+            return False
+        
     def get_age_choices(self):
         if "get_age_choices" in self.cache:
             return self.cache["get_age_choices"]
@@ -113,6 +120,14 @@ class Service:
             response = self.api_client.show_diet_choices()
             if response["code"] == 200:
                 return response["data"]["diet"]
+            
+    def get_pax_choices(self):
+        if "get_pax_choices" in self.cache:
+            return self.cache["get_pax_choices"]
+        else:
+            response = self.api_client.show_pax_choices()
+            if response["code"] == 200:
+                return response["data"]["pax"]       
             
     def change_age(self, user_id, age):
         response = self.api_client.change_age(user_id, age)
@@ -151,6 +166,13 @@ class Service:
     
     def change_diet_preferences(self, user_id, preferences):
         response = self.api_client.change_diet_preferences(user_id, preferences)
+        if response["code"] == 200:
+            return True
+        else:
+            return False
+        
+    def change_pax_preferences(self, user_id, preferences):
+        response = self.api_client.change_pax_preferences(user_id, preferences)
         if response["code"] == 200:
             return True
         else:
@@ -217,5 +239,3 @@ class Service:
         response = self.api_client.check_chat_for_user(user_id)
         if response["code"] == 200:
             return response["data"]
-
-
