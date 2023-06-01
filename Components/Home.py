@@ -13,11 +13,12 @@ class Home:
     """
     def __init__(self):
         self.service = Service()
-
         self.age_choices = self.service.get_age_choices()
         self.gender_choices = self.service.get_gender_choices()
+        self.pax_choices = self.service.get_pax_choices()
         self.cuisine_choices = self.service.get_cuisine_choices()
         self.diet_choices = self.service.get_diet_choices()
+        
 
     def convert_to_text(self, selected, choice_dict):
         """Looks up a list of keys for selected options, and converts it to a readable string
@@ -52,12 +53,14 @@ class Home:
         """
         telename = update.effective_chat.username
 
-        if self.service.is_user_existing(telename):  # For existing users
-            data = self.service.show_profile(telename)
+        chat_id = update.effective_chat.id
+
+        if self.service.is_user_existing(chat_id):  # For existing users
+            data = self.service.show_profile(chat_id)
 
             if not is_redirect:  # If willingly pressed a button, then delete the previous message
                 query = update.callback_query
-                await context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.id)
+                await context.bot.edit_message_reply_markup(chat_id=query.message.chat_id, message_id=query.message.id)
 
             # Generate a message with users current profile information for ease of viewing
             message = bot_text.home_existing_user.format(telename,
@@ -65,6 +68,7 @@ class Home:
                                               self.convert_to_text(data["gender"], self.gender_choices),
                                               self.convert_to_text(data["age pref"], self.age_choices),
                                               self.convert_to_text(data["gender pref"], self.gender_choices),
+                                              self.convert_to_text(data["pax pref"], self.pax_choices),
                                               self.convert_to_text(data["cuisine pref"], self.cuisine_choices),
                                               self.convert_to_text(data["diet pref"], self.diet_choices)
                                               )
@@ -78,11 +82,16 @@ class Home:
                                            reply_markup=markup, parse_mode='Markdown')
             return "HOME_START"  # state
         else:  # For new users
+            if telename is None:
+                await context.bot.send_message(chat_id=update.effective_chat.id, text="You don't have a telegram username! Please register one!", 
+                                     parse_mode='Markdown')
+                return ConversationHandler.END
+
             inline_keyboard = [
                 [InlineKeyboardButton('Create a new profile!', callback_data="new_profile")]
             ]
             markup = InlineKeyboardMarkup(inline_keyboard)
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="You don't have an existing user in our db", 
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not an existing user!", 
                                            reply_markup=markup, parse_mode='Markdown')
             
             return "HOME_START"

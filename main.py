@@ -1,27 +1,41 @@
 import logging
 
 from Classes import *
-from Components import *
-
+from Components import * 
 from telegram.ext import *
 from telegram import *
 
 
 config = ConfigManager("dev.config")
 api_key = config.get("telegram_key")
-
 home = Home()
 profile = Profile()
-
+match = Match()
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
+
+
 def main() -> None:
     """Run the bot."""
     # Create the Application and pass it your bot's token.
     application = ApplicationBuilder().token(api_key).build()
+
+    home_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", home.start),
+                      CallbackQueryHandler(callback=home.back_to_start,
+                                           pattern="home")],
+        states={
+            "HOME_START": [CallbackQueryHandler(callback=home.back_to_start,
+                                           pattern="home")]
+        },
+        fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
+        name="match_conversation",
+        persistent=False,
+        allow_reentry=True
+    )
 
     profile_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(callback=profile.profile_home,
@@ -77,7 +91,7 @@ def main() -> None:
             "CHOOSING_DIET": [
                 CallbackQueryHandler(
                     callback=profile.handle_choosing_diet__home,
-                    pattern="1|2|3|Select All|Done"
+                    pattern="1|2|3|4|5|6|Select All|Done"
                 )
             ],
             "CHOOSING_BUDDY_AGE": [
@@ -88,8 +102,14 @@ def main() -> None:
             ],
             "CHOOSING_BUDDY_GENDER": [
                 CallbackQueryHandler(
-                    callback=profile.handle_buddy_gender__home,
+                    callback=profile.handle_buddy_gender__buddy_pax,
                     pattern="1|2|3|Select All|Done"
+                )
+            ],
+            "CHOOSING_BUDDY_PAX": [
+                CallbackQueryHandler(
+                    callback=profile.handle_buddy_pax__home,
+                    pattern="2|3|4|5|6|Select All|Done"
                 )
             ]
         },
@@ -99,31 +119,38 @@ def main() -> None:
         allow_reentry=True
     )
 
-
-    # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
-    home_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", home.start),
-                      CallbackQueryHandler(callback=home.back_to_start,
-                                           pattern="home")],
+    match_handler = ConversationHandler(
+        entry_points=[CallbackQueryHandler(match.find_match, pattern="match", block=False),
+                      CallbackQueryHandler(match.dequeue, pattern="dequeue", block=False)],
         states={
-            "HOME_START": [
-                CallbackQueryHandler(
-                    callback=home.not_implemented_yet,
-                    pattern="match"
-                )
+            "MATCHED": [
+                CommandHandler("options", match.options),
+                MessageHandler(filters = None, callback = match.chat),
+                CallbackQueryHandler(match.report, pattern="report"),
+                CallbackQueryHandler(match.find_match, pattern="find_match")
             ],
+            "OPTIONS": [
+                CallbackQueryHandler(match.find_food, pattern="find_food", block=False),
+                CallbackQueryHandler(match.leave_chat, pattern="leave_chat", block=False)
+            ],
+            "POST_CHAT": [
+                CallbackQueryHandler(match.report, pattern="report", block=False),
+                CallbackQueryHandler(match.find_match, pattern="find_match", block=False)
+            ]
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
-        name="home_conversation",
+        name="match_conversation",
         persistent=False,
         allow_reentry=True
     )
 
     application.add_handler(home_handler)
     application.add_handler(profile_handler)
+    application.add_handler(match_handler)
 
-    # Run the bot until the user presses Ctrl-C
+    application.add_handler(CallbackQueryHandler(match.dequeue, pattern='dequeue', block=False))
     application.run_polling()
 
 if __name__ == '__main__':
+    count = True
     main()

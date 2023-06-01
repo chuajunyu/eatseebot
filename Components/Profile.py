@@ -18,6 +18,7 @@ class Profile:
         # Pre-Fetching the choices from the API
         self.age_choices = self.service.get_age_choices()
         self.gender_choices = self.service.get_gender_choices()
+        self.pax_choices = self.service.get_pax_choices()
         self.cuisine_choices = self.service.get_cuisine_choices()
         self.diet_choices = self.service.get_diet_choices()
 
@@ -114,6 +115,11 @@ class Profile:
         """Generates multi input inline keyboard to take in diet input"""
         await self.multi_option_input(update, context, "diet", selected, edit=edit, special_text=special_text)
 
+    async def multi_pax_input(self, update: Update, context: ContextTypes.DEFAULT_TYPE, selected, 
+                              edit=False, special_text=None):
+        """Generates multi input inline keyboard to take in pax input"""
+        await self.multi_option_input(update, context, "pax", selected, edit=edit, special_text=special_text)
+
     async def new_user_age(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Function to generate a single input age range input for new user creation"""
         await self.single_age_input(update, context)
@@ -142,7 +148,7 @@ class Profile:
         telename = update.effective_chat.username
         chat_id = update.effective_chat.id
         
-        if not self.service.is_user_existing(telename):  # Perform API Call to insert User into the Database
+        if not self.service.is_user_existing(chat_id):  # Perform API Call to insert User into the Database
             if self.service.create_user(chat_id, telename,
                                      context.user_data['age'],  
                                      context.user_data['gender']):
@@ -192,8 +198,8 @@ class Profile:
         """Handles age input and calls api to update, then calls the next step of the personal info 
         editting process, which is single input gender input"""
         query = update.callback_query
-        telename = update.effective_chat.username
-        self.service.change_age(telename, query.data)  # Calls API to update age
+        chat_id = update.effective_chat.id
+        self.service.change_age(chat_id, query.data)  # Calls API to update age
         age_choice = self.age_choices[query.data]
         await context.bot.edit_message_text(text=f"You chose {age_choice} as your age range.",
                                                     chat_id=query.message.chat_id, message_id=query.message.id)
@@ -203,8 +209,8 @@ class Profile:
     async def handle_choosing_gender__home(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles gender input and calls the api to update, then returns to profile home"""
         query = update.callback_query
-        telename = update.effective_chat.username
-        self.service.change_gender(telename, query.data)  # Calls API to update gender
+        chat_id = update.effective_chat.id
+        self.service.change_gender(chat_id, query.data)  # Calls API to update gender
         gender_choice = self.gender_choices[query.data]
         await context.bot.edit_message_text(text=f"You chose {gender_choice} as your gender.",
                                             chat_id=query.message.chat_id, message_id=query.message.id)
@@ -214,8 +220,8 @@ class Profile:
     
     async def choose_buddy_age_pref(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Function to generate a multi input age range input to enter buddy age preference"""
-        telename = update.effective_chat.username
-        selected = self.service.select_user_age_pref(telename)  # Call API to get user's current preferences
+        chat_id = update.effective_chat.id
+        selected = self.service.select_user_age_pref(chat_id)  # Call API to get user's current preferences
         context.user_data["age"] = selected
         
         await self.multi_age_input(update, context, selected, edit=True)
@@ -231,23 +237,38 @@ class Profile:
         
     async def choose_buddy_gender(self, update: Update, context: ContextTypes.DEFAULT_TYPE):  
         """Function to generate a multi input gender input to enter buddy gender preference"""    
-        telename = update.effective_chat.username
-        selected = self.service.select_user_gender_pref(telename)
+        chat_id = update.effective_chat.id
+        selected = self.service.select_user_gender_pref(chat_id)
         context.user_data["gender"] = selected
         await self.multi_gender_input(update, context, selected)
 
-    async def handle_buddy_gender__home(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def handle_buddy_gender__buddy_pax(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles multi gender input and calls the api to update, then returns to profile home"""
+        async def done():
+            await self.choose_buddy_pax(update, context)
+        
+        return await self.general_multi_handler(update, context, "gender", "CHOOSING_BUDDY_GENDER", 
+                                                "CHOOSING_BUDDY_PAX", done_function=done)
+    
+    async def choose_buddy_pax(self, update: Update, context: ContextTypes.DEFAULT_TYPE):  
+        """Function to generate a multi input pax input to enter buddy pax preference"""    
+        chat_id = update.effective_chat.id
+        selected = self.service.select_user_pax_pref(chat_id)
+        context.user_data["pax"] = selected
+        await self.multi_pax_input(update, context, selected)
+
+    async def handle_buddy_pax__home(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles multi gender input and calls the api to update, then returns to profile home"""
         async def done():
             await self.profile_home(update, context, is_redirect=True)
         
-        return await self.general_multi_handler(update, context, "gender", "CHOOSING_BUDDY_GENDER", 
+        return await self.general_multi_handler(update, context, "pax", "CHOOSING_BUDDY_PAX", 
                                                 "PROFILE_HOME", done_function=done)
 
     async def edit_your_cuisine_pref(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Function to generate a multi input cuisine input to enter cuisine preference""" 
-        telename = update.effective_chat.username
-        selected = self.service.select_user_cuisine_pref(telename)
+        chat_id = update.effective_chat.id
+        selected = self.service.select_user_cuisine_pref(chat_id)
         context.user_data["cuisine"] = selected
         
         await self.multi_cuisine_input(update, context, selected, edit=True)
@@ -263,8 +284,8 @@ class Profile:
 
     async def edit_your_diet_pref(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Function to generate a multi input cuisine input to enter diet preference"""    
-        telename = update.effective_chat.username
-        selected = self.service.select_user_diet_pref(telename)
+        chat_id = update.effective_chat.id
+        selected = self.service.select_user_diet_pref(chat_id)
         context.user_data["diet"] = selected
         
         await self.multi_diet_input(update, context, selected)
@@ -303,8 +324,8 @@ class Profile:
         pressed = query.data
         if pressed == "Done":
             if context.user_data[field] or can_be_empty:
-                telename = update.effective_chat.username
-                eval(f"self.service.change_{field}_preferences")(telename, context.user_data[field])
+                chat_id = update.effective_chat.id
+                eval(f"self.service.change_{field}_preferences")(chat_id, context.user_data[field])
                 await context.bot.edit_message_text(text=f"{field.capitalize()} Preferences Registered!",
                                                         chat_id=query.message.chat_id, message_id=query.message.id)
                 await done_function()

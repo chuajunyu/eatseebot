@@ -14,17 +14,18 @@ Have fun!"""
 
 home_existing_user = """Hey *{}*, welcome back to *@eatseebot*! Here is your profile information!
 
-*Personal Info*
-Age-Range: {}
-Gender: {}
+# *Personal Info*
+*Age-Range*: {}
+*Gender*: {}
 
-*Preferred Matchee Profile*:
-Age-Range: {}
-Gender: {}
+# *Preferred Matchee Profile*:
+*Age-Range*: {}
+*Gender*: {}
+*Pax*: {}
 
-*Food and Diet Preferences*:
-Cuisine Preferences: {}
-Dietary Restrictions: {}
+# *Food and Diet Preferences*:
+*Cuisine Preferences*: {}
+*Dietary Restrictions*: {}
 
 Find a match to eat a meal with now!
 """
@@ -40,6 +41,8 @@ choose_multi_diet = "Enter any dietary restrictions you may have"
 choose_multi_age = "Pick the age ranges you would like your Eatsee buddy to fall into!"
 
 choose_multi_gender = "Pick the genders you would like your Eatsee buddy to fall into!"
+
+choose_multi_pax = "Pick the number of buddies you would like to get matched with in a single chat!"
 
 
 profile = """What would you like to edit?
