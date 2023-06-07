@@ -125,7 +125,11 @@ def main() -> None:
         states={
             "MATCHED": [
                 CommandHandler("options", match.options),
+
+                MessageHandler(filters.LOCATION, callback=match.handle_get_location_partner, block=False),
                 MessageHandler(filters = None, callback = match.chat),
+
+                # In the case that the match has already ended by the partner, these buttons would be available
                 CallbackQueryHandler(match.report, pattern="report"),
                 CallbackQueryHandler(match.find_match, pattern="find_match")
             ],
@@ -149,7 +153,7 @@ def main() -> None:
                 CallbackQueryHandler(match.matched_state, pattern="return_to_matched", block=False)
             ],
             "WAITING_FOR_LOC": [
-                MessageHandler(filters.LOCATION, callback=match.handle_get_location)
+                MessageHandler(filters.LOCATION, callback=match.handle_get_location, block=False)
             ],
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],

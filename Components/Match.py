@@ -6,8 +6,14 @@ import asyncio
 from Classes import Service
 
 class Match:
+    """
+    Class Handling the Matching and Chatting of users, as well as the functions within
+    the chat, such as getting food recommendations
+    """
     def __init__(self):
         self.service = Service()
+        self.location= dict()
+        self.pending_location = list()
 
     async def matched_state(self, update, context):
         return "MATCHED"
@@ -70,7 +76,6 @@ class Match:
                                     text="You stopped matching", reply_markup=markup)
             return ConversationHandler.END
 
-
     def get_chatroom_users(self, chat_id):
         chatroom_id = self.service.select_chatroom(chat_id)
         return self.service.select_chatroom_user(chatroom_id)
@@ -78,9 +83,9 @@ class Match:
     def get_partner_ids(self, chat_id):
         return [id for id in self.get_chatroom_users(chat_id) if id != chat_id]
         
-    async def send_text(self, partner_ids, message, context: ContextTypes.DEFAULT_TYPE):
-        for partner in partner_ids:
-            await context.bot.send_message(chat_id=partner, text=message)
+    async def send_text(self, recipient_ids, message, context: ContextTypes.DEFAULT_TYPE):
+        for recipient in recipient_ids:
+            await context.bot.send_message(chat_id=recipient, text=message)
 
     async def send_payload_to_partners(self, partner_ids, message, context: ContextTypes.DEFAULT_TYPE):
         for partner in partner_ids:
@@ -100,7 +105,20 @@ class Match:
         partner_ids = self.get_partner_ids(chat_id)
         await self.send_payload_to_partners(partner_ids, update.message, context)
         return "MATCHED"
+    
+    async def handle_get_location_partner(self, update, context):
+        chat_id = update.effective_chat.id
+
+        if chat_id in self.pending_location:
+            self.pending_location.remove(chat_id)
+        else:
+            return "MATCHED"
         
+        message = update.message
+        current_pos = (message.location.latitude, message.location.longitude)
+        self.location[chat_id] = current_pos
+        return "MATCHED"
+            
     async def options(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Check if the user is in chat, else this function should not be allowed
         chat_id = update.effective_chat.id
@@ -123,7 +141,8 @@ class Match:
         # remove user from chat
         chat_id = update.effective_chat.id
         chatroom_id = self.service.select_chatroom(chat_id)
-
+        
+        self.pending_location.remove(chat_id)
         self.service.delete_chatroom_user(chat_id)
         await self.post_chat(chat_id, context)
         
@@ -131,6 +150,7 @@ class Match:
         remaining = self.service.select_chatroom_user(chatroom_id)
         if len(remaining) == 1:
             self.service.delete_chatroom_user(remaining[0])
+            self.pending_location.remove(remaining[0])
             await self.post_chat(remaining[0], context)
         return "POST_CHAT"
         
@@ -147,6 +167,9 @@ class Match:
         return
 
     async def find_food(self, update, context):
+        query = update.callback_query
+        await context.bot.edit_message_text(text="Hungry liao isit?", chat_id=query.message.chat_id, message_id=query.message.id)
+
         inline_keyboard = [
                 [InlineKeyboardButton("Quick Recommendations", callback_data="quick_find")],
                 [InlineKeyboardButton("Customized Recommendations", callback_data="custom_find")],
@@ -158,6 +181,9 @@ class Match:
         return "CHOOSING_REC_TYPE"
     
     async def quick_find(self, update, context):
+        query = update.callback_query
+        await context.bot.edit_message_text(text="You chose quickfind", chat_id=query.message.chat_id, message_id=query.message.id)
+
         chat_id = update.effective_chat.id
         inline_keyboard = [
                 [InlineKeyboardButton("Enter your live locations", callback_data="location")],
@@ -169,18 +195,30 @@ class Match:
         return "CHOOSING_LOCATION_TYPE"
 
     async def get_location(self, update, context):
+        query = update.callback_query
+        await context.bot.edit_message_text(text="You selected live locations", chat_id=query.message.chat_id, message_id=query.message.id)
         chat_id = update.effective_chat.id
         message = "Send your gps location pls"
         chatroom_user_ids = self.get_chatroom_users(chat_id)
+        self.pending_location.extend(chatroom_user_ids)
         await self.send_text(chatroom_user_ids, message, context)
         return 'WAITING_FOR_LOC'
 
     async def handle_get_location(self, update, context):
+        chat_id = update.effective_chat.id
         message = update.message
         current_pos = (message.location.latitude, message.location.longitude)
-        chat_id = update.effective_chat.id
-        result = self.service.get_food_recommendations([chat_id], [current_pos])
+        self.pending_location.remove(chat_id)
+        self.location[chat_id] = current_pos
+
         chatroom_user_ids = self.get_chatroom_users(chat_id)
+        
+        while any([True for id in chatroom_user_ids if id in self.pending_location]):
+            await asyncio.sleep(2)
+
+        coordinates = [self.location[id] for id in chatroom_user_ids if id in self.location]
+        result = self.service.get_food_recommendations(chatroom_user_ids, coordinates)
+        
         for restaurant in result[:5]:
             message = self.service.format_restaurant(restaurant)
             await self.send_text(chatroom_user_ids, message, context)
