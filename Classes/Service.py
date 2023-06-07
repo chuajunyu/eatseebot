@@ -1,6 +1,7 @@
 from .APIClient import APIClient
 from .KeyboardGenerator import KeyboardGenerator
 
+import bot_text
 
 class Service:
     """
@@ -195,7 +196,8 @@ class Service:
     def match_user(self, user_id):
         response = self.api_client.match(user_id)
         if response["code"] == 200:
-            data = response["data"]
+            print(response["data"])
+            data = response["data"]["final_id_and_names_exclusive"]
             return data
         else:
             return False
@@ -239,3 +241,25 @@ class Service:
         response = self.api_client.check_chat_for_user(user_id)
         if response["code"] == 200:
             return response["data"]
+        
+    def get_food_recommendations(self, user_id_list, 
+                                 user_coords, 
+                                 town="", 
+                                 max_distance=2):
+        response = self.api_client.get_food_recommendations(user_id_list, user_coords, town, max_distance)
+        if response["code"] == 200:
+            return response["data"]
+
+    def format_restaurant(self, restaurant):
+        result = bot_text.restaurant
+        return result.format(restaurant["name"],
+                             restaurant["address"],
+                             restaurant["cuisine"],
+                             restaurant["opening_hours"],
+                             restaurant["rating"],
+                             restaurant["nearest_town"].lower(),
+                             restaurant["image_url"])
+
+
+
+        

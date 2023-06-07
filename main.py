@@ -131,12 +131,26 @@ def main() -> None:
             ],
             "OPTIONS": [
                 CallbackQueryHandler(match.find_food, pattern="find_food", block=False),
-                CallbackQueryHandler(match.leave_chat, pattern="leave_chat", block=False)
+                CallbackQueryHandler(match.leave_chat, pattern="leave_chat", block=False),
+                CallbackQueryHandler(match.matched_state, pattern="return_to_matched", block=False)
             ],
             "POST_CHAT": [
                 CallbackQueryHandler(match.report, pattern="report", block=False),
                 CallbackQueryHandler(match.find_match, pattern="find_match", block=False)
-            ]
+            ],
+            "CHOOSING_REC_TYPE": [
+                CallbackQueryHandler(match.quick_find, pattern="quick_find", block=False),
+                CallbackQueryHandler(match.custom_find, pattern="custom_find", block=False),
+                CallbackQueryHandler(match.matched_state, pattern="return_to_matched", block=False)
+            ],
+            "CHOOSING_LOCATION_TYPE": [
+                CallbackQueryHandler(match.get_location, pattern="location", block=False),
+                CallbackQueryHandler(match.get_town, pattern="town", block=False),
+                CallbackQueryHandler(match.matched_state, pattern="return_to_matched", block=False)
+            ],
+            "WAITING_FOR_LOC": [
+                MessageHandler(filters.LOCATION, callback=match.handle_get_location)
+            ],
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
         name="match_conversation",

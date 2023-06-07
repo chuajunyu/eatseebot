@@ -9,6 +9,9 @@ class Match:
     def __init__(self):
         self.service = Service()
 
+    async def matched_state(self, update, context):
+        return "MATCHED"
+
     async def find_match(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id = update.effective_chat.id
         query = update.callback_query
@@ -67,24 +70,36 @@ class Match:
                                     text="You stopped matching", reply_markup=markup)
             return ConversationHandler.END
 
+
+    def get_chatroom_users(self, chat_id):
+        chatroom_id = self.service.select_chatroom(chat_id)
+        return self.service.select_chatroom_user(chatroom_id)
+        
+    def get_partner_ids(self, chat_id):
+        return [id for id in self.get_chatroom_users(chat_id) if id != chat_id]
+        
+    async def send_text(self, partner_ids, message, context: ContextTypes.DEFAULT_TYPE):
+        for partner in partner_ids:
+            await context.bot.send_message(chat_id=partner, text=message)
+
+    async def send_payload_to_partners(self, partner_ids, message, context: ContextTypes.DEFAULT_TYPE):
+        for partner in partner_ids:
+            if message["text"]:
+                await context.bot.send_message(chat_id=partner, text=message["text"])
+            elif message["photo"]:
+                await context.bot.send_photo(chat_id=partner, photo=message["photo"][0])
+            elif message["sticker"]:
+                await context.bot.send_sticker(chat_id=partner, sticker=message["sticker"])
+
     async def chat(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Check if user is in chat, else this function should not be executed
         chat_id = update.effective_chat.id
         if not self.service.is_user_in_chat(chat_id):
             return "POST_CHAT"
-
-        chatroom_id = self.service.select_chatroom(chat_id)
-
-        partner_ids = [id for id in self.service.select_chatroom_user(chatroom_id) if id != chat_id]
-        for partner in partner_ids:
-            if update.message["text"]:
-                await context.bot.send_message(chat_id = partner, text = update.message["text"])
-            elif update.message["photo"]:
-                await context.bot.send_photo(chat_id = partner, photo = update.message["photo"][0])
-            elif update.message["sticker"]:
-                await context.bot.send_sticker(chat_id = partner, sticker = update.message["sticker"])
-            return "MATCHED"
         
+        partner_ids = self.get_partner_ids(chat_id)
+        await self.send_payload_to_partners(partner_ids, update.message, context)
+        return "MATCHED"
         
     async def options(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Check if the user is in chat, else this function should not be allowed
@@ -95,7 +110,7 @@ class Match:
         inline_keyboard = [
             [InlineKeyboardButton("Recommend Food", callback_data="find_food")], 
             [InlineKeyboardButton("End Match", callback_data="leave_chat")],
-            [InlineKeyboardButton("Close Options", callback_data="return_to_matched")],
+            [InlineKeyboardButton("Cancel", callback_data="return_to_matched")],
         ]
         markup = InlineKeyboardMarkup(inline_keyboard)
         await context.bot.send_message(chat_id=chat_id, text="HEre are y our options grrr meowm", reply_markup=markup)
@@ -132,8 +147,52 @@ class Match:
         return
 
     async def find_food(self, update, context):
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Food Recommendations are Coming SOON!")
+        inline_keyboard = [
+                [InlineKeyboardButton("Quick Recommendations", callback_data="quick_find")],
+                [InlineKeyboardButton("Customized Recommendations", callback_data="custom_find")],
+                [InlineKeyboardButton("Cancel", callback_data="return_to_matched")]
+            ]
+        markup = InlineKeyboardMarkup(inline_keyboard)
+        chat_id = update.effective_chat.id
+        await context.bot.send_message(chat_id=chat_id, text="what kind of food recoomendation u want", reply_markup=markup)
+        return "CHOOSING_REC_TYPE"
+    
+    async def quick_find(self, update, context):
+        chat_id = update.effective_chat.id
+        inline_keyboard = [
+                [InlineKeyboardButton("Enter your live locations", callback_data="location")],
+                [InlineKeyboardButton("Choose a town!", callback_data="town")],
+                [InlineKeyboardButton("Cancel", callback_data="return_to_matched")]
+            ]
+        markup = InlineKeyboardMarkup(inline_keyboard)
+        await context.bot.send_message(chat_id=chat_id, text="choose how u want your location thingy bro", reply_markup=markup)
+        return "CHOOSING_LOCATION_TYPE"
+
+    async def get_location(self, update, context):
+        chat_id = update.effective_chat.id
+        message = "Send your gps location pls"
+        chatroom_user_ids = self.get_chatroom_users(chat_id)
+        await self.send_text(chatroom_user_ids, message, context)
+        return 'WAITING_FOR_LOC'
+
+    async def handle_get_location(self, update, context):
+        message = update.message
+        current_pos = (message.location.latitude, message.location.longitude)
+        chat_id = update.effective_chat.id
+        result = self.service.get_food_recommendations([chat_id], [current_pos])
+        chatroom_user_ids = self.get_chatroom_users(chat_id)
+        for restaurant in result[:5]:
+            message = self.service.format_restaurant(restaurant)
+            await self.send_text(chatroom_user_ids, message, context)
         return "MATCHED"
+
+    async def get_town(self, update, context):
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="REPORT feature is Coming SOON!")
+        return "MATCHED"
+
+    async def custom_find(self, update, context):
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="CUSTOM FIND is Coming SOON!")
+        return "POST_CHAT"
     
     async def report(self, update, context):
         await context.bot.send_message(chat_id=update.effective_chat.id, text="REPORT feature is Coming SOON!")

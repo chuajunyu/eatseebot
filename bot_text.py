@@ -53,4 +53,16 @@ profile = """What would you like to edit?
 """
 
 
+restaurant = """*{}*
+
+Address: {}
+Cuisine: {}
+Opening Hours: {}
+Rating: {}
+Town: {}
+
+{}
+"""
+
+
 
