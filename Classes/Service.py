@@ -1,7 +1,7 @@
 from .APIClient import APIClient
 from .KeyboardGenerator import KeyboardGenerator
 
-import bot_text
+from Assets import bot_text
 
 class Service:
     """
@@ -245,20 +245,20 @@ class Service:
     def get_food_recommendations(self, user_id_list, 
                                  user_coords, 
                                  town="", 
-                                 max_distance=2):
+                                 max_distance=3):
         response = self.api_client.get_food_recommendations(user_id_list, user_coords, town, max_distance)
         if response["code"] == 200:
             return response["data"]
 
     def format_restaurant(self, restaurant):
-        result = bot_text.restaurant
-        return result.format(restaurant["name"],
+        result = bot_text.restaurant_text
+        result = result.format(restaurant["name"],
                              restaurant["address"],
-                             restaurant["cuisine"],
-                             restaurant["opening_hours"],
+                             ", ".join(restaurant["cuisine"]),
                              restaurant["rating"],
                              restaurant["nearest_town"].lower(),
                              restaurant["image_url"])
+        return result
 
 
 

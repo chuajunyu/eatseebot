@@ -126,6 +126,7 @@ def main() -> None:
             "MATCHED": [
                 CommandHandler("options", match.options),
 
+                CallbackQueryHandler(match.handle_get_location_partner, pattern="prev_loc", block=False),
                 MessageHandler(filters.LOCATION, callback=match.handle_get_location_partner, block=False),
                 MessageHandler(filters = None, callback = match.chat),
 
@@ -153,7 +154,11 @@ def main() -> None:
                 CallbackQueryHandler(match.matched_state, pattern="return_to_matched", block=False)
             ],
             "WAITING_FOR_LOC": [
+                CallbackQueryHandler(match.handle_get_location, pattern="prev_loc", block=False),
                 MessageHandler(filters.LOCATION, callback=match.handle_get_location, block=False)
+            ],
+            "WAITING_FOR_TOWN": [
+                MessageHandler(filters.TEXT, callback = match.handle_get_town)
             ],
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],

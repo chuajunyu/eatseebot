@@ -2,7 +2,7 @@ import logging
 from telegram.ext import *
 from telegram import *
 
-import bot_text
+from Assets import bot_text
 
 from Classes import Service
 from Classes import KeyboardGenerator
