@@ -125,18 +125,41 @@ def main() -> None:
         states={
             "MATCHED": [
                 CommandHandler("options", match.options),
+
+                CallbackQueryHandler(match.handle_get_location_partner, pattern="prev_loc", block=False),
+                MessageHandler(filters.LOCATION, callback=match.handle_get_location_partner, block=False),
                 MessageHandler(filters = None, callback = match.chat),
+
+                # In the case that the match has already ended by the partner, these buttons would be available
                 CallbackQueryHandler(match.report, pattern="report"),
                 CallbackQueryHandler(match.find_match, pattern="find_match")
             ],
             "OPTIONS": [
                 CallbackQueryHandler(match.find_food, pattern="find_food", block=False),
-                CallbackQueryHandler(match.leave_chat, pattern="leave_chat", block=False)
+                CallbackQueryHandler(match.leave_chat, pattern="leave_chat", block=False),
+                CallbackQueryHandler(match.matched_state, pattern="return_to_matched", block=False)
             ],
             "POST_CHAT": [
                 CallbackQueryHandler(match.report, pattern="report", block=False),
                 CallbackQueryHandler(match.find_match, pattern="find_match", block=False)
-            ]
+            ],
+            "CHOOSING_REC_TYPE": [
+                CallbackQueryHandler(match.quick_find, pattern="quick_find", block=False),
+                CallbackQueryHandler(match.custom_find, pattern="custom_find", block=False),
+                CallbackQueryHandler(match.matched_state, pattern="return_to_matched", block=False)
+            ],
+            "CHOOSING_LOCATION_TYPE": [
+                CallbackQueryHandler(match.get_location, pattern="location", block=False),
+                CallbackQueryHandler(match.request_town, pattern="town", block=False),
+                CallbackQueryHandler(match.matched_state, pattern="return_to_matched", block=False)
+            ],
+            "WAITING_FOR_LOC": [
+                CallbackQueryHandler(match.handle_get_location, pattern="prev_loc", block=False),
+                MessageHandler(filters.LOCATION, callback=match.handle_get_location, block=False)
+            ],
+            "WAITING_FOR_TOWN": [
+                MessageHandler(filters.TEXT, callback = match.handle_get_town)
+            ],
         },
         fallbacks=[MessageHandler(filters.Regex("^Done$"), home.start)],
         name="match_conversation",

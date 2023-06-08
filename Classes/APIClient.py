@@ -25,6 +25,8 @@ class APIClient(metaclass = Singleton):
         url = self.api_ip + endpoint
         try:
             response = requests.get(url, json=data)
+            if response.status_code != 200:
+                raise Exception(response.text)
         except BaseException as e:
             raise e
         return response
@@ -34,6 +36,8 @@ class APIClient(metaclass = Singleton):
         url = self.api_ip + endpoint
         try:
             response = requests.post(url, json=data)
+            if response.status_code != 200:
+                raise Exception(response.text)
         except BaseException as e:
             raise e
         return response
@@ -182,6 +186,7 @@ class APIClient(metaclass = Singleton):
         data = {
             "user_id" : user_id
         }
+        print(data)
         response = self.api_post("/dequeue/", data=data)
         return response.json()
 
@@ -219,4 +224,17 @@ class APIClient(metaclass = Singleton):
             "user_id" : chatroom_id
         }
         response = self.api_post("/select_chatroom/", data=data)
+        return response.json()
+    
+    def get_food_recommendations(self, user_id_list, 
+                                 user_coords, 
+                                 town, 
+                                 max_distance):
+        data = {
+            "user_id_list": user_id_list,
+            "user_coords": user_coords,
+            "town": town,
+            "max_distance": max_distance
+        }
+        response = self.api_post("/find_restaurants_tgt/", data=data)
         return response.json()

@@ -14,16 +14,16 @@ Have fun!"""
 
 home_existing_user = """Hey *{}*, welcome back to *@eatseebot*! Here is your profile information!
 
-# *Personal Info*
+*Personal Info*
 *Age-Range*: {}
 *Gender*: {}
 
-# *Preferred Matchee Profile*:
+*Preferred Matchee Profile*:
 *Age-Range*: {}
 *Gender*: {}
 *Pax*: {}
 
-# *Food and Diet Preferences*:
+*Food and Diet Preferences*:
 *Cuisine Preferences*: {}
 *Dietary Restrictions*: {}
 
@@ -50,6 +50,57 @@ profile = """What would you like to edit?
 *Personal Info* -- Your Age and Gender
 *Food Preference* -- Cuisine and Diet Restrictions
 *Buddy Preference* -- Your Matchee's Age and Gender
+"""
+
+
+match_options_text = """From @eatsee:
+
+What would you like to do?
+
+_Note that any messages sent now cannot be seen by your match_
+"""
+
+
+
+find_food_text = """From @eatsee:
+
+Choose the following options to get started!
+
+Quick Recommendations - Find food based on the current location and profile preferences of all the users!
+"""
+
+partner_initiated_text = """@eatseebot: Your partner initiated find food!"""
+
+
+choose_location_text = """@eatseebot: Where would you like to eat at?
+
+Enter your live locations - Share your live locations with me! I will find places in the middle of all users!
+
+Choose a town - Choose a town in Singapore that you would like to eat at!
+"""
+
+share_location_text = """@eatseebot: Please share your live location with me!
+"""
+
+post_sharing_text = """@eatseebot: Got your location! Waiting for the other users to share their location!"""
+
+generating_restaurants_text = """@eatseebot: Generating tasty food places now!"""
+
+state_town_text = """@eatseebot: Type the name of the town that you want to get recommendations from!
+
+E.g. Jurong East, Tampines, Central etc"""
+
+confirm_town = "@eatseebot: Gotcha! Did you mean '{}'? "
+
+
+restaurant_text = """*{}*
+
+Address: {}
+Cuisine: {}
+Rating: {}
+Town: {}
+
+[link]({})
 """
 
 
