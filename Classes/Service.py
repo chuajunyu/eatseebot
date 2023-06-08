@@ -248,7 +248,7 @@ class Service:
                                  max_distance=3):
         response = self.api_client.get_food_recommendations(user_id_list, user_coords, town, max_distance)
         if response["code"] == 200:
-            return response["data"]
+            return response["data"]["town"], response["data"]["restaurant"]
 
     def format_restaurant(self, restaurant):
         result = bot_text.restaurant_text
@@ -259,7 +259,3 @@ class Service:
                              restaurant["nearest_town"].lower(),
                              restaurant["image_url"])
         return result
-
-
-
-        

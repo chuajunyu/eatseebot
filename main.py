@@ -150,7 +150,7 @@ def main() -> None:
             ],
             "CHOOSING_LOCATION_TYPE": [
                 CallbackQueryHandler(match.get_location, pattern="location", block=False),
-                CallbackQueryHandler(match.get_town, pattern="town", block=False),
+                CallbackQueryHandler(match.request_town, pattern="town", block=False),
                 CallbackQueryHandler(match.matched_state, pattern="return_to_matched", block=False)
             ],
             "WAITING_FOR_LOC": [
