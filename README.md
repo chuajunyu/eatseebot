@@ -23,5 +23,13 @@ python -m venv venv
 venv\scripts\activate
 pip install -r requirements.txt
 ```
-3. run `py main.py`
+
+3. Fill up the configuration values in `config.config`
+
+```
+API_ip = YOUR_BACKEND_API_IP
+telegram_key = YOUR_TELEGRAM_BOT_KEY
+```
+
+4. run `py main.py`
 
